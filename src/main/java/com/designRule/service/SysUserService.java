@@ -2,6 +2,7 @@ package com.designRule.service;
 
 import com.designRule.pojo.vo.SysuserCustom;
 import com.designRule.pojo.vo.SysuserQueryVo;
+import com.designRule.result.ExceptionResultInfo;
 
 import java.util.List;
 
@@ -12,6 +13,6 @@ import java.util.List;
  * @Modified By:
  */
 public interface SysUserService {
-    public int querySysUserCount(SysuserQueryVo sysuserQueryVo);
-    public List<SysuserCustom> querySysUser(SysuserQueryVo sysuserQueryVo);
+    public int querySysUserCount(SysuserQueryVo sysuserQueryVo) throws Exception;
+    public List<SysuserCustom> querySysUser(SysuserQueryVo sysuserQueryVo)throws Exception;
 }

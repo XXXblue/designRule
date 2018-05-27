@@ -36,4 +36,17 @@
         <property name="suffix" value=".jsp"></property>
     </bean>
 
+
+    <!-- json转换器 -->
+    <bean id="jsonMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    </bean>
+
+    <!-- 统一异常处理类 -->
+    <bean id="handlerExceptionResolver"
+          class="com.designRule.exception.ExceptionResolverCustom">
+        <!-- 注入一个json转换器 -->
+        <property name="jsonMessageConverter" ref="jsonMessageConverter" />
+    </bean>
+
 </beans>

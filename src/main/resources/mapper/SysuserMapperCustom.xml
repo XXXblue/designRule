@@ -15,7 +15,7 @@
             </if>
         </if>
     </sql>
-
+<!--这个例子比较特殊，由于他连接的不止一个表，所以sql语句就没能体现出单表的优势，如果只连一个的时候，sql语句采用单表，灵活性就会体现出来-->
     <select id="querySysuser" parameterType="com.designRule.pojo.vo.SysuserQueryVo" resultType="com.designRule.pojo.vo.SysuserCustom">
         select * from (
             select sysuser.id,userid,username,groupid,pwd,sysid,mc from sysuser INNER JOIN designdepartment on sysuser.sysid = designdepartment.id and sysuser.groupid = 1

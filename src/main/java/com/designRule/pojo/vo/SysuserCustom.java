@@ -8,6 +8,7 @@ import com.designRule.pojo.Sysuser;
  * @Description:
  * @Modified By:
  */
+//多表扩展的结果返回类型
 public class SysuserCustom extends Sysuser {
     private String mc;
 

@@ -22,6 +22,11 @@
   <servlet>
     <servlet-name>spring</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 屏蔽springmvc自动注册的异常处理器 这样那个异常处理器才会生效 -->
+    <init-param>
+      <param-name>detectAllHandlerExceptionResolvers</param-name>
+      <param-value>false</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>spring</servlet-name>

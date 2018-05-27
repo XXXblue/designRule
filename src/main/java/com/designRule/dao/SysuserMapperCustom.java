@@ -11,6 +11,7 @@ import java.util.List;
  * @Description:
  * @Modified By:
  */
+//多表扩展的mapper
 public interface SysuserMapperCustom {
 
     int querySysuserCount(SysuserQueryVo sysuserQueryVo);
