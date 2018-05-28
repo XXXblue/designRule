@@ -6,15 +6,14 @@ import com.designRule.pojo.vo.SysuserQueryVo;
 import com.designRule.result.ExceptionResultInfo;
 import com.designRule.result.ResultInfo;
 import com.designRule.service.SysUserService;
-import com.designRule.utils.PageQuery;
-import com.designRule.utils.PageResult;
-import com.designRule.utils.ResourcesUtil;
-import com.designRule.utils.ResultUtil;
+import com.designRule.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -83,5 +82,45 @@ public class SysUserController {
         pageResult.setMsg("");
         pageResult.setCode(0);
         return pageResult;
+    }
+
+    @RequestMapping("/exportYpxxSubmit")
+    @ResponseBody
+    public String exportYpxxSubmit() throws Exception {
+        //上面这个可以带XXXQueryVo参数，导出指定条件的数据，导出的文件会在你的虚拟文件目录生成文件，用tomcat访问虚拟文件目录的web路径即可直接下载文件
+
+        //导出文件存放的路径，并且是虚拟目录指向的路径，这个是你文件目录，如果是linux环境下就要换成linux的目录
+        String filePath = "d:/upload/linshi/";
+        //导出文件的前缀
+        String filePrefix="ypxx";
+        //-1表示关闭自动刷新，手动控制写磁盘的时机，其它数据表示多少数据在内存保存，超过的则写入磁盘
+        int flushRows=100;
+        //定义导出数据的title
+        List<String> fieldNames=new ArrayList<String>();
+        fieldNames.add("流-水-号");
+        fieldNames.add("通-用-名");
+        fieldNames.add("价-格");
+        //告诉导出类数据list中对象的属性，让ExcelExportSXXSSF通过反射获取对象的值
+        List<String> fieldCodes=new ArrayList<String>();
+        fieldCodes.add("bm");//药品流水号
+        fieldCodes.add("mc");//通用名
+        fieldCodes.add("price");//价格
+        //注意：fieldCodes和fieldNames个数必须相同且属性和title顺序一一对应，这样title和内容才一一对应
+        //开始导出，执行一些workbook及sheet等对象的初始创建
+        ExcelExportSXXSSF excelExportSXXSSF = ExcelExportSXXSSF.start(filePath, "/upload/", filePrefix, fieldNames, fieldCodes, flushRows);
+        //准备导出的数据，将数据存入list，且list中对象的字段名称必须是刚才传入ExcelExportSXXSSF的名称
+        //现在导出的数据先不从数据库取出，模拟导出看看能否成功
+        List<Ypxx> list = new ArrayList<Ypxx>();
+        Ypxx ypxx1 = new Ypxx("001", "青霉素", 5);
+        Ypxx ypxx2 = new Ypxx("002", "感冒胶囊", 2.5f);
+        list.add(ypxx1);
+        list.add(ypxx2);
+        //执行导出
+        excelExportSXXSSF.writeDatasByObject(list);
+        //输出文件，返回下载文件的http地址
+        String webpath = excelExportSXXSSF.exportFile();
+        System.out.println(webpath);
+        //返回这个webpath可以填充到页面的a标签中提供给页面点击下载，
+        return webpath;
     }
 }
