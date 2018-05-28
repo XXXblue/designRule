@@ -1,7 +1,6 @@
 package com.designRule.controller;
 
-import com.alibaba.druid.sql.PagerUtils;
-import com.designRule.pojo.Sysuser;
+
 import com.designRule.pojo.vo.SysuserCustom;
 import com.designRule.pojo.vo.SysuserQueryVo;
 import com.designRule.result.ExceptionResultInfo;
@@ -9,6 +8,8 @@ import com.designRule.result.ResultInfo;
 import com.designRule.service.SysUserService;
 import com.designRule.utils.PageQuery;
 import com.designRule.utils.PageResult;
+import com.designRule.utils.ResourcesUtil;
+import com.designRule.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +35,17 @@ public class SysUserController {
 //        模拟可预知异常
 //        ResultInfo resultInfo = new ResultInfo();
 //        resultInfo.setMessageCode(ResultInfo.TYPE_RESULT_FAIL);
-//        resultInfo.setMessage("我觉得不行");
+//        测试国际化
+//        resultInfo.setMessage(ResourcesUtil.getValue("messages","101"));
 //        if(1==1){
 //            throw new ExceptionResultInfo(resultInfo);
 //        }
+
+
+//        这个resultUtil就是把上面那一大堆代码封装成一句话，result是系统级别的，它应该还包括submitInfo的结果信息的封装
+//        ResultUtil.throwExcepion(ResultUtil.createFail("messages",101,null));
+
+
 //        模拟未知错误异常
 //        int a = 1/0;
         return new ModelAndView("list");
