@@ -7,6 +7,7 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/tx ">
     <!--上下文的注解会被spring进行管理-->
     <context:annotation-config/>
@@ -36,6 +37,20 @@
         <property name="suffix" value=".jsp"></property>
     </bean>
 
+    <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 指定所上传文件的总大小不能超过200000KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+        <property name="maxUploadSize" value="200000000"/>
+    </bean>
+    <!-- 该异常是SpringMVC在检查上传的文件信息时抛出来的，而且此时还没有进入到Controller方法中 -->
+    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <!-- 遇到MaxUploadSizeExceededException异常时，自动跳转到/WEB-INF/jsp/error/error.jsp页面 -->
+                <prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">error/error</prop>
+            </props>
+        </property>
+    </bean>
 
     <!-- json转换器 -->
     <bean id="jsonMessageConverter"

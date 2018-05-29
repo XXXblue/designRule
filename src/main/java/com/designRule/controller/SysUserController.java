@@ -10,11 +10,19 @@ import com.designRule.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author: XBlue
@@ -27,6 +35,8 @@ public class SysUserController {
 
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private HxlsOptRowsInterface hxlsOptRowsInterface;
 
     @RequestMapping("/list")
     public ModelAndView list() throws Exception {
@@ -84,12 +94,14 @@ public class SysUserController {
         return pageResult;
     }
 
+//    excel导出
     @RequestMapping("/exportYpxxSubmit")
     @ResponseBody
     public String exportYpxxSubmit() throws Exception {
         //上面这个可以带XXXQueryVo参数，导出指定条件的数据，导出的文件会在你的虚拟文件目录生成文件，用tomcat访问虚拟文件目录的web路径即可直接下载文件
 
-        //导出文件存放的路径，并且是虚拟目录指向的路径，这个是你文件目录，如果是linux环境下就要换成linux的目录
+        //==============导出文件存放的路径，并且是虚拟目录指向的路径，这个是你文件目录，如果是linux环境下就要换成linux的目录
+        //==============这里还有要改进的地方就是这个filePath和后面的webFilePath要单独抽成一张系统运行参数表，可供用户修改配置
         String filePath = "d:/upload/linshi/";
         //导出文件的前缀
         String filePrefix="ypxx";
@@ -122,5 +134,49 @@ public class SysUserController {
         System.out.println(webpath);
         //返回这个webpath可以填充到页面的a标签中提供给页面点击下载，
         return webpath;
+    }
+
+//    excel导入
+    @RequestMapping("/upload")
+    public ModelAndView upload() throws Exception {
+        return new ModelAndView("upload");
+    }
+
+    @RequestMapping("/uploadfile")
+    @ResponseBody
+    public String uploadfile(@RequestParam MultipartFile[] myfiles, HttpServletRequest request) throws IOException {
+        for(MultipartFile multipartFile:myfiles){
+            if(!multipartFile.isEmpty()){
+                String originalFileName = multipartFile.getOriginalFilename();
+                //写入磁盘文件
+                File file = new File("D:/upload/linshi/"+ UUIDBuild.getUUID()+originalFileName.substring(originalFileName.lastIndexOf(".")));
+                //文件不存在则创建
+                if(!file.exists()){
+                    file.mkdirs();
+                }
+                //写入磁盘
+                multipartFile.transferTo(file);
+                String absolutePath = file.getAbsolutePath();
+                HxlsRead xls2csv = null;
+                try {
+                    //第一个参数就是导入的文件
+                    //第二个参数就是导入文件中哪个sheet
+                    //第三个参数导入接口的实现类对象,这个hxlsOptRowsInterface的bean是注入进来的，它的实现类已经在xml文件进行了配置了。
+                    xls2csv = new HxlsRead(absolutePath,0,hxlsOptRowsInterface);
+                    xls2csv.process();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                long success = xls2csv.getOptRows_success();
+                long fail = xls2csv.getOptRows_failure();
+                System.out.println(success+"=============================");
+                System.out.println(fail+"===============================");
+            }
+        }
+        return "success";
     }
 }
