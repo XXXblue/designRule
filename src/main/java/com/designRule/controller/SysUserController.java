@@ -144,7 +144,7 @@ public class SysUserController {
 
     @RequestMapping("/uploadfile")
     @ResponseBody
-    public String uploadfile(@RequestParam MultipartFile[] myfiles, HttpServletRequest request) throws IOException {
+    public String uploadfile(@RequestParam MultipartFile[] myfiles, HttpServletRequest request) throws Exception {
         for(MultipartFile multipartFile:myfiles){
             if(!multipartFile.isEmpty()){
                 String originalFileName = multipartFile.getOriginalFilename();
@@ -175,6 +175,41 @@ public class SysUserController {
                 long fail = xls2csv.getOptRows_failure();
                 System.out.println(success+"=============================");
                 System.out.println(fail+"===============================");
+
+//                失败记录处理
+                List<List<String>>rows=xls2csv.getFailrows();
+//                失败的原因
+                List<String>result=xls2csv.getFailmsgs();
+                if(rows!=null&&rows.size()>0){
+                    //将上边获取到的失败记录，title，失败原因导出成一个excel
+                    //使用工具类导出，得到下载路径
+                    String filePath = "d:/upload/linshi/";
+                    String filePrefix="ypxx_fail";
+                    int flushRows=100;
+                    List<String> fieldNames=new ArrayList<String>();
+                    fieldNames.add("流-水-号");
+                    fieldNames.add("通-用-名");
+                    fieldNames.add("价-格");
+                    fieldNames.add("失败原因");
+                    List<String> fieldCodes=new ArrayList<String>();
+                    fieldCodes.add("bm");//药品流水号
+                    fieldCodes.add("mc");//通用名
+                    fieldCodes.add("price");//价格
+                    fieldCodes.add("failMsg");//失败原因
+                    ExcelExportSXXSSF excelExportSXXSSF = ExcelExportSXXSSF.start(filePath, "/upload/", filePrefix, fieldNames, fieldCodes, flushRows);
+                    List<Ypxx> list = new ArrayList<Ypxx>();
+                    int msgFailResultCount = 0;
+                    for(List<String>list_temp1 : rows){
+                        Ypxx ypxx_temp = new Ypxx(list_temp1.get(0), list_temp1.get(1), Float.parseFloat(list_temp1.get(2)));
+                        ypxx_temp.setFailMsg(result.get(msgFailResultCount++));
+                        list.add(ypxx_temp);
+                    }
+                    //执行导出
+                    excelExportSXXSSF.writeDatasByObject(list);
+                    //输出文件，返回下载文件的http地址
+                    String webpath = excelExportSXXSSF.exportFile();
+                    System.out.println(webpath);
+                }
             }
         }
         return "success";

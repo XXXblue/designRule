@@ -10,6 +10,15 @@ public class Ypxx {
     private String bm;
     private String mc;
     private float price;
+    private String failMsg;
+
+    public String getFailMsg() {
+        return failMsg;
+    }
+
+    public void setFailMsg(String failMsg) {
+        this.failMsg = failMsg;
+    }
 
     public Ypxx(String bm, String mc, float price) {
         this.bm = bm;
